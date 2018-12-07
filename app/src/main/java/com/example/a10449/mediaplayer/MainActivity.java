@@ -66,19 +66,25 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                //静止
+                //停止拖动
             }
         });
         mplay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //播放或者暂停
+                if(mPlayerConntrol!=null) {
+                    mPlayerConntrol.playorpause();
+                }
             }
         });
         mClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //关闭按钮被点击
+                if(mPlayerConntrol!=null) {
+                    mPlayerConntrol.stop();
+                }
             }
         });
     }
