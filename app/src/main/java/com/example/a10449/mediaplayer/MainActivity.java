@@ -67,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 //停止拖动
+                int touchProgress=seekBar.getProgress();
+                if (mPlayerConntrol != null) {
+                    mPlayerConntrol.seekTo(touchProgress);
+                }
             }
         });
         mplay.setOnClickListener(new View.OnClickListener() {
