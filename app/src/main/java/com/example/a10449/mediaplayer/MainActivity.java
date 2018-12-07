@@ -7,11 +7,13 @@ import android.media.CamcorderProfile;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     private SeekBar mSeekBar;
     private Button mClose;
     private Button mplay;
@@ -31,10 +33,12 @@ public class MainActivity extends AppCompatActivity {
     }
 //开启服务
     private void initService() {
+        Log.d(TAG,"initService");
         startService(new Intent(this,PlayerService.class));
     }
 //绑定服务
     private void initBindService() {
+        Log.d(TAG,"initBindService");
         Intent intent=new Intent(this,PlayerService.class);
         if(mPlayerConnection==null)
         {
@@ -44,10 +48,12 @@ public class MainActivity extends AppCompatActivity {
     }
     private class PlayerConnection implements ServiceConnection{
         public void onServiceConnected(ComponentName name,IBinder service){
+            Log.d(TAG,"onServiceConnected-->"+service);
             PlayerControl playerControl=(PlayerControl) service;
         }
         public void onServiceDisconnected(ComponentName name){
-
+            Log.d(TAG,"onServiceDisconnected");
+            mPlayerConntrol=null;
         }
 
 
@@ -68,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 //停止拖动
                 int touchProgress=seekBar.getProgress();
+                Log.d(TAG,"touchProgress-->"+touchProgress);
                 if (mPlayerConntrol != null) {
                     mPlayerConntrol.seekTo(touchProgress);
                 }
@@ -103,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (mPlayerConnection != null) {
+            Log.d(TAG,"unbind service-->onDestroy");
             unbindService(mPlayerConnection);
         }
     }
