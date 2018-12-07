@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mClose;
     private Button mplay;
     private PlayerConnection mPlayerConnection;
+    private PlayerControl mPlayerConntrol;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private class PlayerConnection implements ServiceConnection{
         public void onServiceConnected(ComponentName name,IBinder service){
-
+            PlayerControl playerControl=(PlayerControl) service;
         }
         public void onServiceDisconnected(ComponentName name){
 
