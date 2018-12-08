@@ -12,6 +12,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 
+import static com.example.a10449.mediaplayer.PlayerControl.PLAY_STATE_PAUSE;
+import static com.example.a10449.mediaplayer.PlayerControl.PLAY_STATE_PLAY;
+import static com.example.a10449.mediaplayer.PlayerControl.PLAY_STATE_STOP;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private SeekBar mSeekBar;
@@ -19,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mplay;
     private PlayerConnection mPlayerConnection;
     private PlayerControl mPlayerConntrol;
+    private boolean isUserTouchProgressBar=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private class PlayerConnection implements ServiceConnection{
         public void onServiceConnected(ComponentName name,IBinder service){
             Log.d(TAG,"onServiceConnected-->"+service);
-            PlayerControl playerControl=(PlayerControl) service;
+            mPlayerConntrol=(PlayerControl) service;
+            //开启
+            mPlayerConntrol.registerViewController(mPlayerViewControl);
         }
         public void onServiceDisconnected(ComponentName name){
             Log.d(TAG,"onServiceDisconnected");
@@ -68,11 +75,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 //手触摸
+                isUserTouchProgressBar=true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 //停止拖动
+                isUserTouchProgressBar=false;
                 int touchProgress=seekBar.getProgress();
                 Log.d(TAG,"touchProgress-->"+touchProgress);
                 if (mPlayerConntrol != null) {
@@ -110,8 +119,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (mPlayerConnection != null) {
+            //先释放资源
+            mPlayerConntrol.unRegisterViewController();
             Log.d(TAG,"unbind service-->onDestroy");
             unbindService(mPlayerConnection);
         }
     }
+    private PlayerViewControl mPlayerViewControl=new PlayerViewControl() {
+        @Override
+        public void onPlayStateChange(int state) {
+            //根据播放状态修改UI
+            switch (state)
+            {
+                case PLAY_STATE_PLAY:
+                    //修改UI,把按钮显示成暂停
+                    mClose.setText("暂停");
+                    break;
+                case PLAY_STATE_PAUSE:
+                    mClose.setText("播放");
+                    break;
+                case PLAY_STATE_STOP:
+                    break;
+            }
+        }
+
+        @Override
+        public void onSeekChange(int seek) {
+            //改变播放进度，当触摸到进度条时，update
+            if (!isUserTouchProgressBar) {
+                mSeekBar.setProgress(seek);
+            }
+        }
+    };
 }
